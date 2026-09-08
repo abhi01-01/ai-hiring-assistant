@@ -51,7 +51,7 @@ class CallLog(Base):
     transcript = Column(Text, nullable=True)
     summary = Column(Text, nullable=True)
     duration_seconds = Column(Integer, nullable=True)
-    result = Column(String(100), nullable=True)
+    result = Column(Text, nullable=True)
     recording_url = Column(String(1000), nullable=True)
     custom_data = Column(JSON, nullable=True)
 

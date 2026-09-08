@@ -119,7 +119,7 @@ async def process_hunar_webhook(
     if summary is not None:
         call_log.summary = str(summary)
     if result is not None:
-        call_log.result = str(result)
+        call_log.result = json.dumps(result, ensure_ascii=False)
     if recording_url is not None:
         call_log.recording_url = str(recording_url)
     if duration is not None:
