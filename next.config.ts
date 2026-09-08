@@ -5,7 +5,7 @@ const nextConfig: NextConfig = {
         return [
             {
                 source: "/api/:path*",
-                destination: "http://ai-hiring-assistant.railway.internal/api/:path*",
+                destination: "http://ai-hiring-assistant.railway.internal:8000/api/:path*",
             },
         ];
     },
