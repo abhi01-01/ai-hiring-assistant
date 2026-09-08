@@ -6,7 +6,7 @@ export const dynamic = "force-dynamic";
 
 async function getCandidates() {
     try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/candidates/`, {
+        const res = await fetch("http://backend:8000/api/candidates/", {
             cache: "no-store",
         });
 
