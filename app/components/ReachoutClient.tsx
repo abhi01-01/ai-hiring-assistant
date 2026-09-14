@@ -102,7 +102,8 @@ export function ReachoutClient() {
             </CardHeader>
             <CardContent className="space-y-6">
                 <div className="grid gap-4 md:grid-cols-2">
-                    <input className="w-full p-3 border rounded-md bg-background" placeholder="Company" value={company} onChange={(e) => setCompany(e.target.value)} />
+                    <input className="w-full p-3 border rounded-md bg-background" placeholder="Company name or domain (e.g. hunar.ai" value={company} onChange={(e) => setCompany(e.target.value)} />
+                    <p className="mt-1 text-xs text-muted-foreground">A domain filters precisely; a plain name is only a best-effort hint.</p>
                     <input className="w-full p-3 border rounded-md bg-background" placeholder="Job role" value={jobRole} onChange={(e) => setJobRole(e.target.value)} />
                 </div>
                 <textarea

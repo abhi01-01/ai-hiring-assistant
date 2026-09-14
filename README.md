@@ -704,7 +704,7 @@ For a production deployment, configuring and rotating a real webhook secret is p
 
 ### CORS
 
-`CORS_ORIGINS` is parsed as a comma-separated list. In production it should contain the deployed frontend origin, for example:
+`CORS_ORIGINS` is parsed as a comma-separated list. In production, it contains the deployed frontend origin, for example:
 
 ```env
 CORS_ORIGINS=https://your-frontend-domain.example
@@ -800,7 +800,7 @@ flowchart TD
 
 Current workflow behavior:
 
-- Runs on pushes to `main`, `master`, and `development`.
+- Runs on pushes to `main`.
 - Runs for pull requests targeting those branches.
 - Backend job installs dependencies and compiles Python modules.
 - Frontend job installs npm dependencies and performs a production Next.js build.
@@ -908,37 +908,43 @@ The callback parser accepts several naming variants so the application is resili
 
 The current application is a functional prototype / production-style foundation, not a finished enterprise IAM platform.
 
-Recommended hardening before exposing it broadly:
+1. Always configure `HUNAR_WEBHOOK_SECRET` when Hunar supports it for the production integration.
+2. Restrict `CORS_ORIGINS` to known frontend origins.
+3. Store API credentials only in a secret manager / platform secret store.
+4. Add request IDs and structured audit logging.
+5. Consider webhook idempotency / replay protection if the provider can retry callbacks.
+6. Protect recording URLs if they expose sensitive data. 
+7. Add database backups and restore procedures before production use.
 
-1. Add recruiter authentication and authorization.
-2. Add rate limiting on public API routes and webhooks.
-3. Always configure `HUNAR_WEBHOOK_SECRET` when Hunar supports it for the production integration.
-4. Restrict `CORS_ORIGINS` to known frontend origins.
-5. Store API credentials only in a secret manager / platform secret store.
-6. Add request IDs and structured audit logging.
-7. Consider webhook idempotency / replay protection if the provider can retry callbacks.
-8. Add stricter authorization around candidate and call records.
-9. Protect recording URLs if they expose sensitive data.
-10. Add database backups and restore procedures before production use.
+[//]: # (## 23. Current limitations)
 
-## 23. Current limitations
+[//]: # ()
+[//]: # (The repository intentionally keeps the scope focused on the recruitment/outreach workflow. The current implementation does not yet provide a complete enterprise recruitment suite.)
 
-The repository intentionally keeps the scope focused on the recruitment/outreach workflow. The current implementation does not yet provide a complete enterprise recruitment suite.
+[//]: # ()
+[//]: # (Known gaps include:)
 
-Known gaps include:
+[//]: # ()
+[//]: # (- No user/login/role-management layer.)
 
-- No user/login/role-management layer.
-- No recruiter-to-organization tenancy model.
-- No full audit trail for every user action.
-- No sophisticated ranking/ML model; the mock provider uses technical-keyword overlap and the Apollo provider delegates discovery to Apollo.
-- No background job queue for long-running integrations.
-- No dedicated observability stack included in the repository.
-- No production-grade webhook replay/idempotency store beyond external-call uniqueness.
-- No automated end-to-end integration suite against real Hunar/Apollo accounts.
+[//]: # (- No recruiter-to-organization tenancy model.)
 
-These are architectural extension points rather than blockers for the current workflow.
+[//]: # (- No full audit trail for every user action.)
 
-## 24. Future evolution
+[//]: # (- No sophisticated ranking/ML model; the mock provider uses technical-keyword overlap and the Apollo provider delegates discovery to Apollo.)
+
+[//]: # (- No background job queue for long-running integrations.)
+
+[//]: # (- No dedicated observability stack included in the repository.)
+
+[//]: # (- No production-grade webhook replay/idempotency store beyond external-call uniqueness.)
+
+[//]: # (- No automated end-to-end integration suite against real Hunar/Apollo accounts.)
+
+[//]: # ()
+[//]: # (These are architectural extension points rather than blockers for the current workflow.)
+
+## 23. Future evolution
 
 A natural evolution path is:
 
@@ -966,7 +972,7 @@ Potential next-stage engineering improvements include:
 - Fine-grained RBAC and tenant isolation.
 
 
-## 25. Development commands
+## 24. Development commands
 
 Frontend:
 
@@ -995,7 +1001,7 @@ docker build -f api/Dockerfile -t ai-hiring-backend .
 docker build -f Dockerfile.frontend -t ai-hiring-frontend .
 ```
 
-## 26. Technology stack
+## 25. Technology stack
 
 ### Frontend
 

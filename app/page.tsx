@@ -4,9 +4,11 @@ import { ReachoutClient } from "./components/ReachoutClient";
 // Force Next.js to dynamically render this page to avoid caching stale candidate lists
 export const dynamic = "force-dynamic";
 
+const backendUrl = process.env.BACKEND_URL || "http://localhost:8000";
+
 async function getCandidates() {
     try {
-        const res = await fetch("/api/candidates/", {
+        const res = await fetch(`${backendUrl}/api/candidates`, {
             cache: "no-store",
         });
 

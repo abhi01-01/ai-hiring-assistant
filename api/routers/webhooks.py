@@ -18,13 +18,18 @@ logger = logging.getLogger(__name__)
 router = APIRouter(prefix="/webhooks", tags=["Webhooks"])
 
 
-def _find_value(payload: dict, keys: tuple[str, ...]):
-    for key in keys:
-        if key in payload and payload[key] not in (None, ""):
-            return payload[key]
-    for value in payload.values():
-        if isinstance(value, dict):
+def _find_value(payload, keys: tuple[str, ...]):
+    if isinstance(payload, dict):
+        for key in keys:
+            if key in payload and payload[key] not in (None, ""):
+                return payload[key]
+        for value in payload.values():
             nested = _find_value(value, keys)
+            if nested is not None:
+                return nested
+    elif isinstance(payload, list):
+        for item in payload:
+            nested = _find_value(item, keys)
             if nested is not None:
                 return nested
     return None
@@ -39,6 +44,18 @@ def _normalize_phone(value: str | None) -> str | None:
 
 def _verify_webhook(raw_body: bytes, signature: str | None) -> None:
     if not settings.HUNAR_WEBHOOK_SECRET:
+        if settings.ENVIRONMENT.strip().lower() != "development":
+            logger.error(
+                "Rejecting Hunar webhook: HUNAR_WEBHOOK_SECRET is not set "
+                "and ENVIRONMENT=%s is not 'development'.",
+                settings.ENVIRONMENT,
+            )
+            raise HTTPException(status_code=503, detail="Webhook signature verification is not configured")
+        logger.warning(
+            "HUNAR_WEBHOOK_SECRET is not set - accepting this Hunar webhook "
+            "unsigned because ENVIRONMENT=development. Set HUNAR_WEBHOOK_SECRET "
+            "before deploying anywhere else."
+        )
         return
     if not signature:
         raise HTTPException(status_code=401, detail="Missing webhook signature")
@@ -92,6 +109,11 @@ async def process_hunar_webhook(
     )
     if phone:
         candidate = candidate_repo.get_by_phone(db, phone_number=phone)
+
+    if call_log is None and candidate is not None:
+        call_log = call_log_repo.get_latest_open_for_candidate(db, candidate_id=candidate.id)
+    if call_log is not None and external_call_id and not call_log.external_call_id:
+        call_log.external_call_id = external_call_id
 
     if call_log is None:
         logger.warning(

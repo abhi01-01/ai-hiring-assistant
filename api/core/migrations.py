@@ -1,13 +1,8 @@
-"""Database bootstrap/migrations.
-
-For a real production deployment, use Alembic with versioned migrations.
-This module deliberately remains idempotent so the assignment can start from
-both a brand-new PostgreSQL volume and an older database volume.
-"""
 
 from sqlalchemy import inspect, text
 
 from api.core.database import Base, engine
+from api.repositories import models
 
 # These are the tables that make up the application's current schema.
 _REQUIRED_TABLES = {"candidates", "call_logs"}
@@ -46,7 +41,7 @@ def run_compatible_migrations() -> None:
             "ALTER TABLE call_logs ADD COLUMN IF NOT EXISTS recording_url VARCHAR(1000)",
             "ALTER TABLE call_logs ADD COLUMN IF NOT EXISTS custom_data JSON",
             "ALTER TABLE call_logs ADD COLUMN IF NOT EXISTS updated_at TIMESTAMPTZ DEFAULT NOW() NOT NULL",
-            "CREATE UNIQUE INDEX IF NOT EXISTS ux_call_logs_external_call_id ON call_logs(external_call_id) WHERE external_call_id IS NOT NULL",
+            "CREATE UNIQUE INDEX IF NOT EXISTS uq_call_logs_external_call_id ON call_logs(external_call_id) WHERE external_call_id IS NOT NULL",
             "CREATE INDEX IF NOT EXISTS ix_call_logs_candidate_created ON call_logs(candidate_id, created_at DESC)",
             "CREATE INDEX IF NOT EXISTS ix_candidates_created_at ON candidates(created_at DESC)",
         ]

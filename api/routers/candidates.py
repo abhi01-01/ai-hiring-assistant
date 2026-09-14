@@ -44,22 +44,3 @@ async def create_candidate(
     return OutreachResponse(candidate=candidate, call=call)
 
 
-@router.get("/dashboard", response_model=list[dict])
-def get_dashboard_data(db: Session = Depends(get_db)):
-    candidates = (
-        db.query(Candidate)
-        .options(selectinload(Candidate.calls))
-        .order_by(Candidate.created_at.desc())
-        .limit(100)
-        .all()
-    )
-    return [
-        {
-            "name": candidate.name,
-            "phone": candidate.phone_number,
-            "status": candidate.calls[0].status if candidate.calls else "PENDING",
-            "transcript": candidate.calls[0].transcript if candidate.calls else None,
-            "summary": candidate.calls[0].summary if candidate.calls else None,
-        }
-        for candidate in candidates
-    ]

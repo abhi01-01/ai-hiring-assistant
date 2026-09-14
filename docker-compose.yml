@@ -30,6 +30,7 @@ services:
       DB_AUTO_MIGRATE: ${DB_AUTO_MIGRATE:-true}
       ENVIRONMENT: ${ENVIRONMENT:-development}
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:3000}
+      UVICORN_RELOAD: ${UVICORN_RELOAD:-1}
     depends_on:
       db:
         condition: service_healthy
@@ -46,6 +47,7 @@ services:
       - "3000:3000"
     environment:
       NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL:-http://localhost:8000}
+      BACKEND_URL: ${BACKEND_URL:-http://backend:8000}
     depends_on:
       backend:
         condition: service_started

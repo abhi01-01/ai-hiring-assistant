@@ -88,6 +88,17 @@ def extract_titles(
 
     return unique[:5] or ["Software Engineer"]
 
+def _extract_domain(company: str) -> str | None:
+
+    candidate = company.strip().lower()
+    if not candidate:
+        return None
+
+    candidate = re.sub(r"^[a-z]+://", "", candidate)
+    candidate = candidate.split("/", 1)[0]
+    candidate = candidate.removeprefix("www.")
+
+    return candidate if "." in candidate else None
 
 class CandidateSearchProvider(ABC):
     @abstractmethod
@@ -129,7 +140,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Priya Verma",
             "email": "priya.verma@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000001",
             "linkedin_url": "https://linkedin.com/in/priya-verma",
             "title": "Backend Software Engineer",
             "company": "Cloud Systems",
@@ -145,7 +156,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Arjun Mehta",
             "email": "arjun.mehta@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000002",
             "linkedin_url": "https://linkedin.com/in/arjun-mehta",
             "title": "Software Engineer",
             "company": "ScaleTech",
@@ -161,7 +172,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Sneha Patel",
             "email": "sneha.patel@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000003",
             "linkedin_url": "https://linkedin.com/in/sneha-patel",
             "title": "Full Stack Engineer",
             "company": "Product Labs",
@@ -177,7 +188,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Vikram Singh",
             "email": "vikram.singh@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000004",
             "linkedin_url": "https://linkedin.com/in/vikram-singh",
             "title": "Lead Backend Engineer",
             "company": "Digital Payments Inc",
@@ -194,7 +205,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Ananya Gupta",
             "email": "ananya.gupta@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000005",
             "linkedin_url": "https://linkedin.com/in/ananya-gupta",
             "title": "Java Developer",
             "company": "Enterprise Software",
@@ -209,7 +220,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Karan Malhotra",
             "email": "karan.malhotra@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000006",
             "linkedin_url": "https://linkedin.com/in/karan-malhotra",
             "title": "Platform Engineer",
             "company": "CloudScale",
@@ -225,7 +236,7 @@ class MockSearchProvider(CandidateSearchProvider):
         {
             "name": "Neha Kapoor",
             "email": "neha.kapoor@example.com",
-            "phone_number": settings.MOCK_CANDIDATE_PHONE,
+            "phone_number": "+919810000007",
             "linkedin_url": "https://linkedin.com/in/neha-kapoor",
             "title": "Senior Software Engineer",
             "company": "Tech Ventures",
@@ -363,21 +374,14 @@ class ApolloSearchProvider(CandidateSearchProvider):
                 ("person_titles[]", title)
             )
 
-        if keywords:
-            params.append(
-                (
-                    "q_keywords",
-                    " ".join(keywords),
-                )
-            )
-
-        if company and "." in company:
-            params.append(
-                (
-                    "q_organization_domains_list[]",
-                    company.strip(),
-                )
-            )
+        company_domain = _extract_domain(company) if company else None
+        keyword_terms = list(keywords)
+        if company and not company_domain:
+            keyword_terms.append(company.strip())
+        if keyword_terms:
+            params.append(("q_keywords", " ".join(keyword_terms)))
+        if company_domain:
+            params.append(("q_organization_domains_list[]", company_domain))
 
         url = (
             f"{self.BASE_URL}"

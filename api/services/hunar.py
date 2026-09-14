@@ -78,6 +78,7 @@ class HunarVoiceService:
                 "https://api.voice.hunar.ai/external/v1/calls/",
                 headers=headers,
                 json=payload,
+                timeout=settings.HUNAR_HTTP_TIMEOUT,
             )
         except httpx.TimeoutException as exc:
             logger.exception("Hunar API timeout")
